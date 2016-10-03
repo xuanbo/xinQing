@@ -1,5 +1,7 @@
 package xinQing.framework.ioc.bean;
 
+import xinQing.framework.ioc.context.BeanScan;
+import xinQing.framework.ioc.context.Configuration;
 import xinQing.framework.ioc.util.Reflects;
 
 import java.util.Map;
@@ -31,6 +33,18 @@ public class SimpleBeanFactory implements BeanFactory {
     public SimpleBeanFactory() {
         this.singletonBeansKeys = new ConcurrentHashMap<>();
         this.singletonBeans = new ConcurrentHashMap<>();
+        initBeanFactory("app.properties");
+    }
+
+    /**
+     * 加载ioc容器的配置文件
+     *
+     * @param configPath
+     */
+    public SimpleBeanFactory(String configPath) {
+        this.singletonBeansKeys = new ConcurrentHashMap<>();
+        this.singletonBeans = new ConcurrentHashMap<>();
+        initBeanFactory(configPath);
     }
 
     @Override
@@ -61,6 +75,21 @@ public class SimpleBeanFactory implements BeanFactory {
         Object object = Reflects.newInstance(className);
         singletonBeans.put(className, object);
         return object;
+    }
+
+    /**
+     * 初始化BeanFactory
+     *
+     * @param configPath    配置文件的路径
+     */
+    public void initBeanFactory(String configPath) {
+        // 创建Bena扫描器
+        BeanScan beanScan = new BeanScan();
+        // 根据配置文件的路径创建Configuration
+        Configuration configuration = new Configuration();
+        configuration.parse(configPath);
+        // 扫描器进行扫描
+        beanScan.beanScan(configuration, this);
     }
 
 }
