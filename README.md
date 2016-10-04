@@ -9,3 +9,6 @@
 
 
 ####	具体实现以及测试看本项目下的xinQing-ioc模块
+
+[ioc具体实现]: https://github.com/xuanbo/xinQing/tree/xuanbo/xinQing-ioc
+
