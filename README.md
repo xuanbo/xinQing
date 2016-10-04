@@ -5,3 +5,7 @@
 ##	一、IOC
 
 ​        大家都知道Spring的IOC容器的原理是使用反射、解析xml或annotation。那么，自己去写却又是一回事了。自己想简单的实现IOC，因此我只实现单例的Bean，和基于annotation的Bean扫描和注入。
+
+
+
+####	具体实现以及测试看本项目下的xinQing-ioc模块

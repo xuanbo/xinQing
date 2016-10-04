@@ -4,8 +4,15 @@ import org.junit.Test;
 import xinQing.framework.ioc.bean.BeanDefinition;
 import xinQing.framework.ioc.bean.BeanFactory;
 import xinQing.framework.ioc.bean.SimpleBeanFactory;
+import xinQing.framework.ioc.dao.UserDao;
+import xinQing.framework.ioc.dao.impl.UserDaoImpl;
 import xinQing.framework.ioc.service.Message;
+import xinQing.framework.ioc.service.UserService;
+import xinQing.framework.ioc.service.impl.UserServiceImpl;
+import xinQing.framework.ioc.util.Reflects;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -118,6 +125,27 @@ public class IOCTest {
             System.out.println(o);
             o.say();
         });
+    }
+
+    /**
+     * 版本4
+     *
+     * 实现注入
+     */
+    @Test
+    public void injectByType() {
+        BeanFactory beanFactory = new SimpleBeanFactory("app.properties");
+        Optional<UserDao> bean1 = beanFactory.getBean(UserDao.class);
+        Optional<UserDaoImpl> bean2 = beanFactory.getBean(UserDaoImpl.class);
+        bean1.ifPresent(bean -> System.out.println(bean));
+        bean2.ifPresent(bean -> System.out.println(bean));
+    }
+
+    @Test
+    public void inject() {
+        BeanFactory beanFactory = new SimpleBeanFactory("app.properties");
+        Optional<UserService> bean = beanFactory.getBean(UserService.class);
+        bean.ifPresent(o -> o.deleteById(1L));
     }
 
 }

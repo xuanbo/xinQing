@@ -20,6 +20,13 @@ import java.util.Set;
  */
 public class BeanScan {
 
+    // 注入器
+    private Injection injection;
+
+    public BeanScan() {
+        this.injection = new Injection();
+    }
+
     /**
      * 扫描包下的Bean
      *
@@ -32,36 +39,38 @@ public class BeanScan {
         boolean recursive = CastUtils.cast(configuration.getProperty(Configuration.BASE_SCAN_RECURSIVE));
         // 扫描包下的Class
         Set<Class<?>> classes = classScan(packageName, recursive);
+        // 过滤掉没有被@Bean标注的Class
+        classes.removeIf(clazz -> !clazz.isAnnotationPresent(Bean.class));
         // 将Bean纳入到容器管理
         classes.forEach(clazz -> handlerBean(clazz, beanFactory));
+        // 处理Bean的注入
+        injection.handlerAutoWired(beanFactory);
     }
 
     /**
-     * 根据包扫描到Class，并将Bean注册到容器
+     * 将Bean注册到容器
      *
      * @param clazz
      * @param beanFactory
      */
     public void handlerBean(Class<?> clazz, BeanFactory beanFactory) {
-        // 如果被Bean Annotation标注，那么放入容器
-        if (clazz.isAnnotationPresent(Bean.class)) {
-            Bean annotation = clazz.getAnnotation(Bean.class);
-            BeanDefinition beanDefinition = new BeanDefinition();
-            String beanName = annotation.value();
-            if (beanName == null || beanName.isEmpty()) {
-                String className = clazz.getSimpleName();
-                // 首字母小写
-                if (className.length() > 1) {
-                    beanName = className.substring(0, 1).toLowerCase() + className.substring(1);
-                } else {
-                    beanName = className.substring(0, 1).toLowerCase();
-                }
+        Bean annotation = clazz.getAnnotation(Bean.class);
+        BeanDefinition beanDefinition = new BeanDefinition();
+        // 获取bean的名称，如果没有指定value属性，则默认为类名的首字母小写
+        String beanName = annotation.value();
+        if (beanName == null || beanName.isEmpty()) {
+            String className = clazz.getSimpleName();
+            // 首字母小写
+            if (className.length() > 1) {
+                beanName = className.substring(0, 1).toLowerCase() + className.substring(1);
+            } else {
+                beanName = className.substring(0, 1).toLowerCase();
             }
-            beanDefinition.setName(beanName);
-            beanDefinition.setClassName(clazz.getName());
-            // 注册到容器
-            beanFactory.registerBean(beanDefinition);
         }
+        beanDefinition.setName(beanName);
+        beanDefinition.setClassName(clazz.getName());
+        // 注册到容器
+        beanFactory.registerBean(beanDefinition);
     }
 
     /**

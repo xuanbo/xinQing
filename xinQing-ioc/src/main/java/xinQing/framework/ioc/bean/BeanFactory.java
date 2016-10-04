@@ -1,5 +1,7 @@
 package xinQing.framework.ioc.bean;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -37,11 +39,35 @@ public interface BeanFactory {
     <T> Optional<T> getBean(String name, Class<T> requireType);
 
     /**
+     * 根据className获取Bean
+     *
+     * @param className
+     * @param <T>
+     * @return
+     */
+    <T> Optional<T> getBeanByClassName(String className);
+
+    /**
      * 注册一个Bean到容器
      *
      * @param beanDefinition
      * @return
      */
     Object registerBean(BeanDefinition beanDefinition);
+
+    /**
+     * 根据父类型找到Bean的ClassName
+     *
+     * @param superClassNameOrInterfaceName
+     * @return
+     */
+    List<String> getBeanClassNames(String superClassNameOrInterfaceName);
+
+    /**
+     * 获取所有的Bean
+     *
+     * @return
+     */
+    Collection<Object> getBeans();
 
 }
