@@ -82,16 +82,8 @@ public class SimpleBeanFactory implements BeanFactory {
     @Override
     public Optional<?> getBean(String name) {
         String className = singletonBeansKeys.get(name);
-        if (className == null || className.isEmpty()) {
-            try {
-                throw new BeanFoundException("根据所给的名称找不到Bean：" + name);
-            } catch (BeanFoundException e) {
-                e.printStackTrace();
-            }
-            return Optional.empty();
-        }
         Object object = singletonBeans.get(className);
-        if (object == null) {
+        if (className == null || className.isEmpty() || object == null) {
             try {
                 throw new BeanFoundException("根据所给的名称找不到Bean：" + name);
             } catch (BeanFoundException e) {
@@ -104,16 +96,8 @@ public class SimpleBeanFactory implements BeanFactory {
     @Override
     public <T> Optional<T> getBean(String name, Class<T> requireType) {
         String className = singletonBeansKeys.get(name);
-        if (className == null || className.isEmpty()) {
-            try {
-                throw new BeanFoundException("根据所给的名称找不到Bean：" + name);
-            } catch (BeanFoundException e) {
-                e.printStackTrace();
-            }
-            return Optional.empty();
-        }
         T object = (T) singletonBeans.get(className);
-        if (object == null) {
+        if (className == null || className.isEmpty() || object == null) {
             try {
                 throw new BeanFoundException("根据所给的名称找不到Bean：" + name);
             } catch (BeanFoundException e) {
