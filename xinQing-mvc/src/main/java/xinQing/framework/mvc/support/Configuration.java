@@ -1,4 +1,6 @@
-package xinQing.framework.ioc.context;
+package xinQing.framework.mvc.support;
+
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,6 +12,8 @@ import java.util.Properties;
  * Created by xuan on 16-10-3.
  */
 public class Configuration {
+
+    private static final Logger log = Logger.getLogger(Configuration.class);
 
     // 扫描包key
     public static final String BASE_SCAN_PACKAGE = "beanScan.packageName";
@@ -34,6 +38,7 @@ public class Configuration {
         try {
             properties.load(inputStream);
         } catch (IOException e) {
+            log.error("找不到配置文件");
             e.printStackTrace();
         }
     }

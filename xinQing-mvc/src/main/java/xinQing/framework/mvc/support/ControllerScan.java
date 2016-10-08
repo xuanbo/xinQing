@@ -1,10 +1,8 @@
-package xinQing.framework.ioc.context;
+package xinQing.framework.mvc.support;
 
 import org.apache.log4j.Logger;
-import xinQing.framework.ioc.annotation.Bean;
-import xinQing.framework.ioc.bean.BeanDefinition;
-import xinQing.framework.ioc.bean.BeanFactory;
-import xinQing.framework.ioc.util.CastUtils;
+import xinQing.framework.mvc.annotation.Controller;
+import xinQing.framework.mvc.util.CastUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,66 +13,35 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * 扫描@Bean标注的Bean
+ * Controller Annotation扫描
  *
- * Created by xuan on 16-10-3.
+ * Created by xuan on 16-10-8.
  */
-public class BeanScan {
+public class ControllerScan {
 
-    private static final Logger log = Logger.getLogger(BeanScan.class);
+    private static final Logger log = Logger.getLogger(ControllerScan.class);
 
-    // 注入器
-    private Injection injection;
+    private Configuration configuration;
 
-    public BeanScan() {
-        this.injection = new Injection();
+    public ControllerScan(Configuration configuration) {
+        this.configuration = configuration;
     }
 
     /**
-     * 扫描包下的Bean
+     * 获取@Controller标识的Class
      *
-     * @param configuration 配置信息
-     * @param beanFactory
+     * @return
      */
-    public void beanScan(Configuration configuration, BeanFactory beanFactory) {
+    public Set<Class<?>> loadControllerClasses() {
         // 获取扫描包的配置信息
         String packageName = configuration.getProperty(Configuration.BASE_SCAN_PACKAGE);
         boolean recursive = CastUtils.cast(configuration.getProperty(Configuration.BASE_SCAN_RECURSIVE));
-        // 扫描包下的Class
         Set<Class<?>> classes = classScan(packageName, recursive);
-        // 过滤掉没有被@Bean标注的Class
-        classes.removeIf(clazz -> !clazz.isAnnotationPresent(Bean.class));
-        // 将Bean纳入到容器管理
-        classes.forEach(clazz -> handlerBean(clazz, beanFactory));
-        // 处理Bean的注入
-        injection.handlerAutoWired(beanFactory);
-    }
-
-    /**
-     * 将Bean注册到容器
-     *
-     * @param clazz
-     * @param beanFactory
-     */
-    public void handlerBean(Class<?> clazz, BeanFactory beanFactory) {
-        log.debug(clazz);
-        Bean annotation = clazz.getAnnotation(Bean.class);
-        BeanDefinition beanDefinition = new BeanDefinition();
-        // 获取bean的名称，如果没有指定value属性，则默认为类名的首字母小写
-        String beanName = annotation.value();
-        if (beanName == null || beanName.isEmpty()) {
-            String className = clazz.getSimpleName();
-            // 首字母小写
-            if (className.length() > 1) {
-                beanName = className.substring(0, 1).toLowerCase() + className.substring(1);
-            } else {
-                beanName = className.substring(0, 1).toLowerCase();
-            }
-        }
-        beanDefinition.setName(beanName);
-        beanDefinition.setClassName(clazz.getName());
-        // 注册到容器
-        beanFactory.registerBean(beanDefinition);
+        classes.removeIf(clazz -> {
+            log.debug(clazz);
+            return !clazz.isAnnotationPresent(Controller.class);
+        });
+        return classes;
     }
 
     /**
@@ -135,5 +102,4 @@ public class BeanScan {
             }
         }
     }
-
 }

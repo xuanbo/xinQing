@@ -27,8 +27,8 @@
 
   ```
   #   ioc的配置信息
-  ioc.beanScan.packageName=com.web // 扫描的包
-  ioc.beanScan.recursive=true	// 是否扫描子包
+  beanScan.packageName=com.web // 扫描的包
+  beanScan.recursive=true	// 是否扫描子包
   ```
 
   ​
