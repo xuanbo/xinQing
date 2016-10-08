@@ -6,7 +6,7 @@
     
     <servlet>
         <servlet-name>dispatchServlet</servlet-name>
-        <servlet-class>xinQing.framework.mvc.servlet.DispatchServlet</servlet-class>
+        <servlet-class>xinQing.framework.mvc.servlet.DispatcherServlet</servlet-class>
         <init-param>
             <param-name>config</param-name>
             <param-value>app.properties</param-value>

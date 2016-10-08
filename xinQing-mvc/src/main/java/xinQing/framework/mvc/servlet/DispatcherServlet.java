@@ -15,9 +15,9 @@ import java.io.IOException;
  *
  * Created by xuan on 16-10-5.
  */
-public class DispatchServlet extends HttpServlet {
+public class DispatcherServlet extends HttpServlet {
 
-    private static final Logger log = Logger.getLogger(DispatchServlet.class);
+    private static final Logger log = Logger.getLogger(DispatcherServlet.class);
 
     private WebApplication application;
 
