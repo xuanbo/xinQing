@@ -1,5 +1,6 @@
 package xinQing.framework.mvc.servlet.param;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -17,6 +18,10 @@ public class MethodInvocation {
     private boolean isAjax;
 
     private String requestMethod;
+
+    public Object invoke(Object... args) throws InvocationTargetException, IllegalAccessException {
+        return method.invoke(object, args);
+    }
 
     public Method getMethod() {
         return method;

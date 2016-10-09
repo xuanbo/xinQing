@@ -27,15 +27,18 @@ public class MatcherMapping {
         MethodInvocation methodInvocation;
         // 精确匹配
         for (Map.Entry<String, MethodInvocation> entry : methodInvocationMap.entrySet()) {
-            if (entry.getKey().equals(path)) {
-                methodInvocation = entry.getValue();
-                log.debug(path + " -> " + methodInvocation.getMethod());
+            methodInvocation = entry.getValue();
+            String url = entry.getKey();
+            String requestMethod = methodInvocation.getRequestMethod();
+            if (path.equals(url) && http.getRequest().getMethod().equalsIgnoreCase(requestMethod)) {
+                log.debug(path + " : " + requestMethod + " -> " + methodInvocation.getMethod());
                 return methodInvocation;
             }
         }
-        // ant restful匹配
+        // restful匹配
 
         // 找不到匹配
+        log.error("Controller中找不到处理请求的方法:" + path + " " + http.getRequest().getMethod());
         return null;
     }
 

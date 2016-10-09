@@ -5,8 +5,12 @@ import xinQing.framework.mvc.annotation.*;
 import xinQing.framework.mvc.servlet.param.Http;
 import xinQing.framework.mvc.servlet.param.MethodInvocation;
 import xinQing.framework.mvc.servlet.param.RequestMethod;
+import xinQing.framework.mvc.util.JsonUtil;
 import xinQing.framework.mvc.util.StringUtil;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
@@ -45,6 +49,14 @@ public class HandlerMapping {
         MethodInvocation methodInvocation = matcherMapping.matcher(http, methodInvocationMap);
         if (methodInvocation == null) {
             return false;
+        }
+        // 获取绑定的参数
+        ParameterBinding parameterBinding = new ParameterBinding();
+        Object[] args = parameterBinding.binding(http, methodInvocation);
+        try {
+            Object o = methodInvocation.invoke(args);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
         }
         // 正确执行返回
         return true;
@@ -104,6 +116,20 @@ public class HandlerMapping {
         invocation.setMethod(method);
         invocation.setAjax(method.isAnnotationPresent(Ajax.class));
         methodInvocationMap.put(value, invocation);
+    }
+
+    public void resolve(Http http, MethodInvocation methodInvocation, Object result) {
+        // 如果是ajax，写入响应
+        if (methodInvocation.isAjax()) {
+            HttpServletResponse response = http.getResponse();
+            response.setContentType("application/json");
+            try {
+                response.getWriter().append(JsonUtil.parse(result));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        // 否则返回视图
     }
 
 }
