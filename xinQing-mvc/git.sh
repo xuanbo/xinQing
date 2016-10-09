@@ -10,6 +10,17 @@ fi
 
 #执行git命令
 git add --a
-git commit -m '$1'
+git commit -m “$1”
+git push origin xuanbo
+
+if [ $? -eq 0];then
+	echo "---------------------------"
+	echo "提交成功"
+	echo "---------------------------"
+else
+	echo -e "\033[31m---------------------------\033[0m"
+	echo -e "\033[31m提交失败\033[0m"
+	echo -e "\033[31m---------------------------\033[0m"
+fi
 
 
