@@ -10,7 +10,7 @@ fi
 
 #执行git命令
 git add --a
-git commit -m “$1”
+git commit -m $1
 git push origin xuanbo
 
 if [ $? -eq 0 ];then

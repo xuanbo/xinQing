@@ -11,3 +11,5 @@
 ##	二、MVC
 
 > ​	写MVC纯属是为了好玩，既然为了实现MVC，第一步肯定是需要一个请求分发器的，也就是Spring MVC中的DispatchServlet。Spring MVC有使用注解配置请求映射，可以很方便的实现Restful风格，因此，我打算用@Get、@Post、@Put、@Delele四个Annotation完成Restful风格。
+
+具体实现以及测试请看本项目下的[xinQing-mvc模块](https://github.com/xuanbo/xinQing/tree/xuanbo/xinQing-mvc)。
