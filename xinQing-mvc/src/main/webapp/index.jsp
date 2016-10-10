@@ -4,6 +4,6 @@
     <title>index</title>
 </head>
 <body>
-    Hello World
+    <p>${name}</p>
 </body>
 </html>

@@ -1,20 +1,37 @@
-package xinQing.framework.mvc.test.controller;
+#	简单的MVC
 
-import org.apache.log4j.Logger;
-import xinQing.framework.mvc.annotation.Ajax;
-import xinQing.framework.mvc.annotation.Controller;
-import xinQing.framework.mvc.annotation.Get;
-import xinQing.framework.mvc.annotation.Param;
-import xinQing.framework.mvc.model.ModelAndView;
+###	使用
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.lang.annotation.Target;
+* web.xml
 
-/**
- * Created by xuan on 16-10-8.
- */
+```java
+    <servlet>
+        <servlet-name>dispatchServlet</servlet-name>
+        <servlet-class>xinQing.framework.mvc.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>config</param-name>
+          	<!-- 配置文件classpath下 -->
+            <param-value>app.properties</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>dispatchServlet</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+```
+
+* app.properties配置扫描Controller
+
+```java
+beanScan.packageName=xinQing.framework.mvc.test.controller
+beanScan.recursive=true
+```
+
+`beanScan.recursive`是否扫描子包
+
+* Controller
+
+```java
 @Controller
 public class UserController {
 
@@ -42,7 +59,9 @@ public class UserController {
     @Get("/mv")
     public ModelAndView mv() {
         ModelAndView modelAndView = new ModelAndView();
+      	// 返回视图
         modelAndView.setName("/index.jsp");
+      	// 值
         modelAndView.setAttributes("name", "xinQing mvc");
         return modelAndView;
     }
@@ -84,3 +103,32 @@ public class UserController {
         }
     }
 }
+```
+
+`@Controller`标注为一个Controller
+
+`@Get`GET请求
+
+`@Ajax`返回json
+
+`@Param`绑定参数
+
+其中: `@Post`、`@Put`、`@Delete`我还没有测试
+
+
+
+###	注意
+
+- 尝试写的这个mvc，不打算加入拦截器等，只处理请求，调用Controller中的方法，返回响应。
+- restful还不支持(后续加上)
+- 文件上传也不支持
+- 不支持请求参数绑定到java对象
+- 不支持返回视图定义前缀后缀
+- 不支持参数校验
+- 很多都不支持，单纯做了请求分发，方法响应
+
+
+
+###	总结
+
+我站在巨人的肩上，而我不是巨人。只有知己尝试去写点东西，才知道自己的渺小，前辈的伟大。

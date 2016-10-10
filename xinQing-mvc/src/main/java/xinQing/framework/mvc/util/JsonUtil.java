@@ -17,6 +17,9 @@ public class JsonUtil {
      */
     public static String parse(Object object) {
         Gson gson = new Gson();
+        if (object instanceof String) {
+            return (String) object;
+        }
         return gson.toJson(object);
     }
 }

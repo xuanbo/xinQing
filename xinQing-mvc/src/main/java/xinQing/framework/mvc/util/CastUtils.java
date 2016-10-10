@@ -1,5 +1,8 @@
 package xinQing.framework.mvc.util;
 
+import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.beanutils.Converter;
+
 import java.lang.reflect.Array;
 
 /**
@@ -27,7 +30,11 @@ public class CastUtils {
      * @return
      */
     public static Object cast(String[] strings, Class<?> clazz) {
+        System.out.println(clazz + "____________");
         Object instance = null;
+        if (strings == null || strings.length == 0) {
+            return instance;
+        }
         int len = strings.length;
         // 如果是数组类型
         if (clazz.isArray()) {
@@ -45,11 +52,22 @@ public class CastUtils {
             instance = cast(strings[0], clazz);
             return instance;
         }
-        return null;
+        if (clazz.isAssignableFrom(String.class)) {
+            instance = strings[0];
+            return instance;
+        }
+        return instance;
     }
 
+    /**
+     * String转为Class类型
+     *
+     * @param str
+     * @param clazz
+     * @return
+     */
     public static Object cast(String str, Class<?> clazz) {
-        return null;
+        return ConvertUtils.convert(str, clazz);
     }
 
 }

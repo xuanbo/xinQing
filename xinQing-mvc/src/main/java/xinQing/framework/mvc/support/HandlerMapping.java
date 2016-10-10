@@ -2,16 +2,20 @@ package xinQing.framework.mvc.support;
 
 import org.apache.log4j.Logger;
 import xinQing.framework.mvc.annotation.*;
+import xinQing.framework.mvc.model.ModelAndView;
 import xinQing.framework.mvc.servlet.param.Http;
 import xinQing.framework.mvc.servlet.param.MethodInvocation;
 import xinQing.framework.mvc.servlet.param.RequestMethod;
 import xinQing.framework.mvc.util.JsonUtil;
 import xinQing.framework.mvc.util.StringUtil;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -50,14 +54,7 @@ public class HandlerMapping {
         if (methodInvocation == null) {
             return false;
         }
-        // 获取绑定的参数
-        ParameterBinding parameterBinding = new ParameterBinding();
-        Object[] args = parameterBinding.binding(http, methodInvocation);
-        try {
-            Object o = methodInvocation.invoke(args);
-        } catch (InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        invokeMethod(http, methodInvocation, new ParameterBinding());
         // 正确执行返回
         return true;
     }
@@ -118,18 +115,68 @@ public class HandlerMapping {
         methodInvocationMap.put(value, invocation);
     }
 
-    public void resolve(Http http, MethodInvocation methodInvocation, Object result) {
-        // 如果是ajax，写入响应
-        if (methodInvocation.isAjax()) {
-            HttpServletResponse response = http.getResponse();
-            response.setContentType("application/json");
-            try {
-                response.getWriter().append(JsonUtil.parse(result));
-            } catch (IOException e) {
-                e.printStackTrace();
+    /**
+     * 调用Controller中的方法
+     *
+     * @param http
+     * @param methodInvocation
+     * @param parameterBinding
+     */
+    public void invokeMethod(Http http, MethodInvocation methodInvocation, ParameterBinding parameterBinding) {
+        // 参数绑定
+        Object[] args = parameterBinding.binding(http, methodInvocation);
+        try {
+            Object result = methodInvocation.invoke(args);
+            // 如果是ajax，写入响应
+            if (methodInvocation.isAjax()) {
+                ajaxResolve(http, result);
             }
+            // 否则返回视图
+            // 返回ModelAndView
+            if (methodInvocation.getMethod().getReturnType() == ModelAndView.class) {
+                modelAndViewResolve(http, (ModelAndView) result);
+            }
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
         }
-        // 否则返回视图
+    }
+
+    /**
+     * ajax
+     *
+     * @param http
+     * @param result
+     */
+    public void ajaxResolve(Http http, Object result) {
+        HttpServletResponse response = http.getResponse();
+        response.setContentType("application/json");
+        try {
+            response.getWriter().append(JsonUtil.parse(result));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * ModelAndView
+     *
+     * @param http
+     * @param modelAndView
+     */
+    public void modelAndViewResolve(Http http, ModelAndView modelAndView) {
+        HttpServletRequest request = http.getRequest();
+        HttpServletResponse response = http.getResponse();
+        try {
+            // 设置模型
+            Map<String, Object> attributes = modelAndView.getAttributes();
+            attributes.forEach((key, value) -> {
+                request.setAttribute(key, value);
+            });
+            // 请求转发
+            request.getRequestDispatcher(modelAndView.getName()).forward(request, response);
+        } catch (ServletException | IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

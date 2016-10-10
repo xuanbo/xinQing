@@ -13,7 +13,7 @@ git add --a
 git commit -m “$1”
 git push origin xuanbo
 
-if [ $? -eq 0];then
+if [ $? -eq 0 ];then
 	echo "---------------------------"
 	echo "提交成功"
 	echo "---------------------------"
