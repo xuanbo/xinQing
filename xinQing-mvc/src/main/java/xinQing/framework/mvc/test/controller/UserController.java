@@ -1,10 +1,7 @@
 package xinQing.framework.mvc.test.controller;
 
 import org.apache.log4j.Logger;
-import xinQing.framework.mvc.annotation.Ajax;
-import xinQing.framework.mvc.annotation.Controller;
-import xinQing.framework.mvc.annotation.Get;
-import xinQing.framework.mvc.annotation.Param;
+import xinQing.framework.mvc.annotation.*;
 import xinQing.framework.mvc.model.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,6 +56,19 @@ public class UserController {
     @Ajax
     public String servlet(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
         return "request:" + request + "\nresponse" +response + "\nsession:" + session;
+    }
+
+    /**
+     * restful风格
+     *
+     * @param id
+     * @return
+     */
+    @Get("/user/:id")
+    @Ajax
+    public String restful(@Path("id") Integer id) {
+        log.debug(id);
+        return "id:" + id;
     }
 
     class Test {

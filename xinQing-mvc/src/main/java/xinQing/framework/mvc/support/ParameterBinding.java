@@ -2,6 +2,7 @@ package xinQing.framework.mvc.support;
 
 import org.apache.log4j.Logger;
 import xinQing.framework.mvc.annotation.Param;
+import xinQing.framework.mvc.annotation.Path;
 import xinQing.framework.mvc.servlet.param.Http;
 import xinQing.framework.mvc.servlet.param.MethodInvocation;
 import xinQing.framework.mvc.util.CastUtils;
@@ -30,7 +31,7 @@ public class ParameterBinding {
      * @param methodInvocation
      * @return
      */
-    public Object[] binding(Http http, MethodInvocation methodInvocation) {
+    public Object[] binding(Http http, MethodInvocation methodInvocation, Map<String, String> restfulMatcher) {
         // 获取请求的参数
         Map<String, String[]> requestParameters = http.getParameters();
         // 获取方法的参数
@@ -54,8 +55,13 @@ public class ParameterBinding {
                 log.debug("绑定后方法的参数值：" + args[i]);
             }
             // 如果被@Path标识
-
-
+            if (parameters[i].isAnnotationPresent(Path.class)) {
+                Path path = parameters[i].getAnnotation(Path.class);
+                String value = path.value();
+                Class<?> type = parameters[i].getType();
+                log.debug("绑定方法参数名：" + value + " 类型:" + type);
+                args[i] = CastUtils.cast(restfulMatcher.get(value), type);
+            }
             // 注入原生Servlet参数
             // 如果是HttpServletRequest
             if (parameters[i].getType() == HttpServletRequest.class) {
@@ -69,7 +75,6 @@ public class ParameterBinding {
             if (parameters[i].getType() == HttpSession.class) {
                 args[i] = http.getRequest().getSession();
             }
-
         }
         return args;
     }

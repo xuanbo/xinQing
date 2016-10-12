@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,12 +50,19 @@ public class HandlerMapping {
         MatcherMapping matcherMapping = new MatcherMapping();
         // 根据请求，找到处理请求的方法
         MethodInvocation methodInvocation = matcherMapping.matcher(http, methodInvocationMap);
-        if (methodInvocation == null) {
-            return false;
+        if (methodInvocation != null) {
+            // 精确匹配
+            invokeMethod(http, methodInvocation, new ParameterBinding(), null);
+            return true;
         }
-        invokeMethod(http, methodInvocation, new ParameterBinding());
-        // 正确执行返回
-        return true;
+        // restful匹配
+        Map<String, Object> result = matcherMapping.restfulMatcher(http, methodInvocationMap);
+        if (result != null) {
+            invokeMethod(http, (MethodInvocation) result.get("methodInvocation"), new ParameterBinding(), (Map<String, String>) result.get("restful"));
+            return true;
+        }
+        // 无法找到处理url的方法
+        return false;
     }
 
     /**
@@ -121,10 +127,11 @@ public class HandlerMapping {
      * @param http
      * @param methodInvocation
      * @param parameterBinding
+     * @param restfulMatcher
      */
-    public void invokeMethod(Http http, MethodInvocation methodInvocation, ParameterBinding parameterBinding) {
+    public void invokeMethod(Http http, MethodInvocation methodInvocation, ParameterBinding parameterBinding, Map<String, String> restfulMatcher) {
         // 参数绑定
-        Object[] args = parameterBinding.binding(http, methodInvocation);
+        Object[] args = parameterBinding.binding(http, methodInvocation, restfulMatcher);
         try {
             Object result = methodInvocation.invoke(args);
             // 如果是ajax，写入响应
